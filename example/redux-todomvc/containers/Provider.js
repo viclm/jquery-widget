@@ -1,0 +1,16 @@
+import { bindActionCreators } from 'redux'
+import * as TodoActions from '../actions'
+
+function Provider(store, widget, appendTo) {
+    let instance = widget({
+        todos: store.getState().todos,
+        actions: bindActionCreators(TodoActions, dispatch)
+    }, appendTo)
+    
+    function dispatch(action) {
+        store.dispatch(action);
+        instance.option('todos', store.getState().todos)
+    }
+}
+
+export default Provider

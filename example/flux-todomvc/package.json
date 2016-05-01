@@ -1,0 +1,32 @@
+{
+  "name": "todomvc-flux",
+  "version": "0.0.3",
+  "description": "Example Flux architecture.",
+  "repository": "https://github.com/facebook/flux",
+  "main": "js/app.js",
+  "dependencies": {
+    "classnames": "^2.1.3",
+    "flux": "^2.0.1",
+    "keymirror": "~0.1.0",
+    "object-assign": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.7.7",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-react-jsx": "^6.7.5",
+    "jest-cli": "^0.4.3",
+    "webpack": "^1.13.0"
+  },
+  "scripts": {
+    "start": "node node_modules/webpack/bin/webpack.js --devtool eval --watch",
+    "build": "node node_modules/webpack/bin/webpack.js -p --devtool cheap-module-source-map",
+    "test": "jest"
+  },
+  "author": [
+    "Bill Fisher",
+    "Ming liu"
+  ],
+  "jest": {
+    "rootDir": "./js"
+  }
+}
