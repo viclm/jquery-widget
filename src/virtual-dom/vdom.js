@@ -11,6 +11,8 @@ function VDOM(props, children) {
     this.props = props || {};
     this.children = children || [];
     this.key = null;
+    this.attributes = {};
+    this.events = {};
 }
 
 VDOM.prototype = {
@@ -31,16 +33,20 @@ VDOM.prototype = {
     },
 
     addEvent: function (element, widget) {
-        var events = this.events;
+        var events = this.events, eventName;
         if (widget) {
             var widgetEvents = {};
-            for (var eventName in events) {
-                widgetEvents[eventName] = $.proxy(events[eventName], widget);
+            for (eventName in events) {
+                widgetEvents[eventName] = $.isFunction(events[eventName]) ? $.proxy(events[eventName], widget): events[eventName];
             }
             widget._on(element, widgetEvents);
         }
         else {
-            element.on(events);
+            for (eventName in events) {
+                if (events.hasOwnProperty(eventName) && $.isFunction(events[eventName])) {
+                    element.on(eventName, events[eventName]);
+                }
+            }
         }
     }
 };

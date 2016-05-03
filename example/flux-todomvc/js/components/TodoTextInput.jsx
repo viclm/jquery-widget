@@ -26,9 +26,9 @@ var TodoTextInput = createWidget('TodoTextInput', {
         classname={this.options.classname}
         id={this.options.id}
         placeholder={this.options.placeholder}
-        onblur={this._save}
-        onchange={this._onChange}
-        onkeydown={this._onKeyDown}
+        onblur="_save"
+        onchange="_onChange"
+        onkeydown="_onKeyDown"
         value={this.options.value}
         autofocus={true}
       />

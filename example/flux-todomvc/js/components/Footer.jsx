@@ -40,7 +40,7 @@ var Footer = createWidget('Footer', {
       clearCompletedButton =
         <button
           id="clear-completed"
-          onclick={this._onClearCompletedClick}>
+          onclick="_onClearCompletedClick">
           Clear completed ({completed})
         </button>;
     }

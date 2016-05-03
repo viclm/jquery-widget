@@ -32,7 +32,7 @@ var TodoItem = createWidget('TodoItem', {
       input =
         <TodoTextInput
           classname="edit"
-          onsave={this._onSave}
+          onsave="_onSave"
           value={todo.text}
         />;
     }
@@ -54,12 +54,12 @@ var TodoItem = createWidget('TodoItem', {
             classname="toggle"
             type="checkbox"
             checked={todo.complete}
-            onchange={this._onToggleComplete}
+            onchange="_onToggleComplete"
           />
-          <label ondblclick={this._onDoubleClick}>
+          <label ondblclick="_onDoubleClick">
             {todo.text}
           </label>
-          <button classname="destroy" onclick={this._onDestroyClick} />
+          <button classname="destroy" onclick="_onDestroyClick" />
         </div>
         {input}
       </li>

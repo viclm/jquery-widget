@@ -23,7 +23,7 @@ var Header = createWidget('Header', {
         <TodoTextInput
           id="new-todo"
           placeholder="What needs to be done?"
-          onsave={this._onSave}
+          onsave="_onSave"
         />
       </header>
     );

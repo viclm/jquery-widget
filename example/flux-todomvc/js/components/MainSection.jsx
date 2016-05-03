@@ -35,7 +35,7 @@ var MainSection = createWidget('MainSection', {
         <input
           id="toggle-all"
           type="checkbox"
-          onchange={this._onToggleCompleteAll}
+          onchange="_onToggleCompleteAll"
           checked={this.options.areAllComplete ? 'checked' : ''}
         />
         <label htmlfor="toggle-all">Mark all as complete</label>
