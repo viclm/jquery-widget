@@ -9,4 +9,4 @@
 
 var TodoApp = require('./components/TodoApp');
 
-TodoApp(null, '#todoapp');
+TodoApp().widget().appendTo('#todoapp');

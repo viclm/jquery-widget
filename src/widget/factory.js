@@ -2,25 +2,6 @@ var $ = require('jquery');
 var extend = require('../util/extend');
 var Widget = require('./base');
 
-$.cleanData = ( function( orig ) {
-    return function( elems ) {
-        var events, elem, i;
-        for ( i = 0; ( elem = elems[ i ] ) != null; i++ ) {
-            try {
-
-                // Only trigger remove when necessary to save time
-                events = $._data( elem, "events" );
-                if ( events && events.remove ) {
-                    $( elem ).triggerHandler( "remove" );
-                }
-
-                // Http://bugs.jquery.com/ticket/8235
-            } catch ( e ) {} //eslint-disable-line
-        }
-        orig( elems );
-    };
-} )( $.cleanData );
-
 function widget( name, base, prototype ) {
     var constructor, basePrototype;
 
@@ -40,15 +21,15 @@ function widget( name, base, prototype ) {
     var bak = window[name];
 
     window.eval([
-    'window.'+name+' = function '+name+'( options, element ) {',
+    'window.'+name+' = function '+name+'( options ) {',
         // Allow instantiation without "new" keyword
         'if ( !this._createWidget ) {',
-        '    return new '+name+'( options, element );',
+        '    return new '+name+'( options );',
         '}',
         // Allow instantiation without initializing for simple inheritance
         // must use "new" keyword (the code above always passes args)
         'if ( arguments.length ) {',
-            'this._createWidget( options, element );',
+            'this._createWidget( options );',
         '}',
     '};'
     ].join(''));
@@ -61,15 +42,6 @@ function widget( name, base, prototype ) {
     else {
         window[name] = bak;
     }
-
-    // Extend with the existing constructor to carry over any static properties
-    $.extend( constructor, {
-        version: prototype.version,
-
-        // Copy the object used to create the prototype in case we need to
-        // redefine the widget later
-        _proto: $.extend( {}, prototype )
-    } );
 
     basePrototype = new base();
 

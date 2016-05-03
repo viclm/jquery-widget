@@ -5,7 +5,8 @@ function Provider(store, widget, appendTo) {
     let instance = widget({
         todos: store.getState().todos,
         actions: bindActionCreators(TodoActions, dispatch)
-    }, appendTo)
+    });
+    instance.widget().appendTo(appendTo);
     
     function dispatch(action) {
         store.dispatch(action);

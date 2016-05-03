@@ -2,6 +2,7 @@ var $ = require('jquery');
 var extend = require('../util/extend');
 var md5 = require('blueimp-md5');
 var vd = require('../virtual-dom');
+require('./helper');
 
 var toString = function (obj) {
     if (!obj) {
@@ -45,7 +46,7 @@ Widget.prototype = {
         return vdom;
     },
 
-    _createWidget: function( options, element ) {
+    _createWidget: function( options ) {
         this.options = extend({},
             this.options,
             this._getCreateOptions(),
@@ -61,8 +62,7 @@ Widget.prototype = {
         this.vtree = this.render();
         this.element = this.vtree ? this.vtree.render(this) : $(this.defaultElement);
 
-        $(element).append(this.element);
-        element = this.element[0];
+        var element = this.element[0];
 
         $.data( element, 'widget-' + this.widgetName, this );
         $.data( element, 'widget', this.widgetName );
