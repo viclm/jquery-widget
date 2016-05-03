@@ -28,7 +28,7 @@ VWidget.prototype.parse = function (widget) {
     VDOM.prototype.parse.call(this);
     var events = {}, eventName;
     for (eventName in this.events) {
-        events[widget.widgetName.toLowerCase() + eventName] = this.events[eventName];
+        events[widget.widgetName.toLowerCase() + ':' + eventName] = this.events[eventName];
     }
     this.events = events;
 };

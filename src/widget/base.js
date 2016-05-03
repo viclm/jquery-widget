@@ -25,7 +25,6 @@ function Widget() {}
 
 Widget.prototype = {
     widgetName: "Widget",
-    widgetEventPrefix: "",
     defaultElement: "<div>",
 
     options: {
@@ -416,9 +415,7 @@ Widget.prototype = {
 
         data = data || {};
         event = $.Event( event );
-        event.type = ( type === this.widgetEventPrefix ?
-            type :
-            this.widgetEventPrefix + type ).toLowerCase();
+        event.type = ( this.widgetName + ':' + type ).toLowerCase();
 
         // The original event may come from any element
         // so we need to reset the target on the new event

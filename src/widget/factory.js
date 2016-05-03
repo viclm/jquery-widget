@@ -80,18 +80,10 @@ function widget( name, base, prototype ) {
             };
         } )();
     } );
-    constructor.prototype = extend(basePrototype, {
-
-        // TODO: remove support for widgetEventPrefix
-        // always use the name + a colon as the prefix, e.g., draggable:start
-        // don't prefix for widgets that aren't DOM-based
-        widgetEventPrefix: name
-    }, proxiedPrototype, {
+    constructor.prototype = extend(basePrototype, proxiedPrototype, {
         constructor: constructor,
         widgetName: name
     } );
-
-    //$.widget.bridge( name, constructor );
 
     return constructor;
 }
