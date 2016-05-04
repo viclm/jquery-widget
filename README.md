@@ -10,7 +10,7 @@ It's easy to integrate it with [flux](http://facebook.github.io/flux/)/[redux](h
 ## Difference to the original implementation
 
 - The option() is also used to manage the component state
-- The render() is added to reflex the state changes to ui view
+- The render() is added to render the component, the original constructor argument called element isn't needed
 - Support JSX and virtual dom, the createWidget() is used to create virtual dom tree
 - Make the widget class local, remove the namespace and the global reference such as `jQuery.ui`
 - Remove the feature of class redefining
@@ -21,7 +21,7 @@ It's easy to integrate it with [flux](http://facebook.github.io/flux/)/[redux](h
 var Footer = require('./Footer');
 var Header = require('./Header');
 var MainSection = require('./MainSection');
-var $ = require('jquery-widget');
+var createWidget = require('jquery-widget');
 var TodoStore = require('../stores/TodoStore');
 
 /**
@@ -34,7 +34,7 @@ function getTodoState() {
   };
 }
 
-var TodoApp = $.widget('TodoApp', {
+var TodoApp = createWidget('TodoApp', {
 
   _getCreateOptions: getTodoState,
 
@@ -68,6 +68,8 @@ var TodoApp = $.widget('TodoApp', {
   }
 
 });
+
+module.exports = TodoApp;
 ```
 
 ## Installation with npm

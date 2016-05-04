@@ -27,15 +27,14 @@ patch.prototype = {
     },
 
     applyPatch: function (node, patch) {
-        var that = this;
+        var widget = this.root.data('widget-' + this.root.data('widget'));
         $.each(patch, function (i, p) {
             switch (p.type) {
                 case patchType.PROPS:
-                    p.node.update(p.props, node);
+                    p.node.update(p.props, node, widget);
                     break;
                 case patchType.REORDER:
                     var siblings = node.children();
-                    var widget = that.root.data('widget-' + that.root.data('widget'));
                     $.each(p.move, function (i, p) {
                         if (p.type === patchType.INSERT) {
                             var originNode = node.children().eq(p.index);
@@ -52,7 +51,7 @@ patch.prototype = {
                     });
                     break;
                 case patchType.REPLACE:
-                    node.replaceWith(p.node.render());
+                    node.replaceWith(p.node.render(widget));
                     break;
             }
         });

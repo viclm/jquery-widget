@@ -1,6 +1,5 @@
 var VDOM = require('./vdom');
 var inherit = require('../util/inherit');
-var $ = require('jquery');
 
 function VWidget(widget, props) {
     VDOM.call(this, props);
@@ -9,28 +8,30 @@ function VWidget(widget, props) {
 
 inherit(VWidget, VDOM);
 
-VWidget.prototype.render = function (parentWidget) {
-    var widget = this.widget(this.props);
-    if (parentWidget) {
-        this.parse(widget);
-        this.addEvent(widget.element, parentWidget);
-    }
-    return widget.widget();
-};
-
-VWidget.prototype.update = function (props, element) {
-    this.props = props;
-    var widget = $.data(element[0], 'widget-' + element.data('widget'));
-    widget.option(props);
-};
-
-VWidget.prototype.parse = function (widget) {
-    VDOM.prototype.parse.call(this);
+VWidget.prototype.parse = function (widgetName, props) {
+    var result = VDOM.prototype.parse.call(this, props);
     var events = {}, eventName;
-    for (eventName in this.events) {
-        events[widget.widgetName.toLowerCase() + ':' + eventName] = this.events[eventName];
+    for (eventName in result.events) {
+        if (result.events.hasOwnProperty(eventName)) {
+            events[(widgetName + ':' + eventName).toLowerCase()] = result.events[eventName];
+        }
     }
-    this.events = events;
+    result.events = events;
+    return result;
 };
+
+VWidget.prototype.render = function (parentWidget) {
+    var result = this.parse(this.widget.prototype.widgetName);
+    var element = this.widget(this.props).element;
+    this.addEvent(result.events, element, parentWidget);
+    return element;
+};
+
+VWidget.prototype.update = function (props, element, parentWidget) {
+    var result = this.parse(element.data('widget'), props);
+    this.addEvent(result.events, element, parentWidget);
+    element.data('widget-' + element.data('widget')).option(props);
+};
+
 
 module.exports = VWidget;

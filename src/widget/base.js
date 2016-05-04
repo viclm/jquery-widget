@@ -113,7 +113,7 @@ Widget.prototype = {
         // all event bindings should go through this._on()
         this.element
             .off( this.eventNamespace )
-            .removeData( this.widgetName );
+            .removeData( 'widget', 'widget-' + this.widgetName );
         this.widget()
             .off( this.eventNamespace )
             .removeAttr( "aria-disabled" );
@@ -182,6 +182,8 @@ Widget.prototype = {
         for ( key in options ) {
             this._setOption( key, options[ key ] );
         }
+
+        if (!this.element.data('widget')) { return; }
 
         var vtree = this.render();
         var patches = vd.diff(this.vtree, vtree).patches;

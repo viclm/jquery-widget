@@ -17,19 +17,28 @@ function VNode(tagName, props, children) {
 inherit(VNode, VDOM);
 
 VNode.prototype.render = function (widget) {
-    this.parse();
-    var element = $('<' + this.tagName + '>', this.attributes);
-    this.addEvent(element, widget);
+    var result = this.parse();
+    var element = $('<' + this.tagName + '>', result.attributes);
+    this.addEvent(result.events, element, widget);
     element.append($.map(this.children, function (child) {
         return child.render(widget);
     }));
     return element;
 };
 
-VNode.prototype.update = function (props, element) {
-    this.props = props;
-    this.parse();
-    element.prop(this.attributes);
+VNode.prototype.update = function (props, element, widget) {
+    var result = this.parse(props);
+    $.each(result.attributes, function (key, value) {
+        if (value === null) {
+            element.removeProp(key);
+            element.removeAttr(key);
+        }
+        else {
+            element.prop(key, value);
+            element.attr(key, value);
+        }
+    });
+    this.addEvent(result.events, element, widget);
 };
 
 

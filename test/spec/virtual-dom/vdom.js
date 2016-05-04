@@ -8,8 +8,6 @@ describe('vdom', function () {
         var instance = new VDOM();
         expect(instance.props).toEqual({});
         expect(instance.children).toEqual([]);
-        expect(instance.attributes).toEqual({});
-        expect(instance.events).toEqual({});
     });
 
     it('parse', function () {
@@ -21,70 +19,45 @@ describe('vdom', function () {
             onclick: 'onClick',
             onsave: function () {}
         });
-        instance.parse();
-        expect(instance.attributes).toEqual({
+        var result = instance.parse();
+        expect(result.attributes).toEqual({
             'class': 'foo',
             'for': 'bar',
             id: 'barz',
             qux: 'quux'
         });
-        expect(instance.events).toEqual({
+        expect(result.events).toEqual({
             click: 'onClick',
             save: jasmine.any(Function)
         });
     });
 
-    describe('addEvent', function () {
+    it('with widget', function () {
+        this.spyClick = jasmine.createSpy('click');
+        this.spySave = jasmine.createSpy('save');
 
-        beforeEach(function () {
-            this.spyClick = jasmine.createSpy('click');
-            this.spySave = jasmine.createSpy('save');
-
-            this.instance = new VDOM({
-                classname: 'foo',
-                htmlfor: 'bar',
-                id: 'barz',
-                qux: 'quux',
-                onclick: 'onClick',
-                onsave: this.spySave
-            });
-
-            this.element = $('<div>');
-            this.widget = createWidget('testWidget', {
-                'onClick': this.spyClick
-            })();
+        this.instance = new VDOM({
+            classname: 'foo',
+            htmlfor: 'bar',
+            id: 'barz',
+            qux: 'quux',
+            onclick: 'onClick',
+            onsave: this.spySave
         });
 
-        it('no parse', function () {
-            this.instance.addEvent(this.element, this.widget);
-            this.element.trigger('click');
-            this.element.trigger('save');
-            expect(this.spyClick).not.toHaveBeenCalled();
-            expect(this.spySave).not.toHaveBeenCalled();
-        });
+        this.element = $('<div>');
+        this.widget = createWidget('testWidget', {
+            'onClick': this.spyClick
+        })();
 
-        it('not widget', function () {
-            this.instance.parse();
-            this.instance.addEvent(this.element);
-            this.element.trigger('click');
-            this.element.trigger('save');
-            expect(this.spyClick).not.toHaveBeenCalled();
-            expect(this.spySave).toHaveBeenCalled();
-            expect(this.spySave.calls.mostRecent().object).toBe(this.element[0]);
-        });
-
-        it('with widget', function () {
-            this.instance.parse();
-            this.instance.addEvent(this.element, this.widget);
-            this.element.trigger('click');
-            this.element.trigger('save');
-            expect(this.spyClick).toHaveBeenCalled();
-            expect(this.spySave).toHaveBeenCalled();
-            expect(this.spyClick.calls.mostRecent().object).toBe(this.widget);
-            expect(this.spySave.calls.mostRecent().object).toBe(this.widget);
-            expect(this.spyClick).toHaveBeenCalledTimes(1);
-            expect(this.spySave).toHaveBeenCalledTimes(1);
-        });
-
+        var result = this.instance.parse();
+        this.instance.addEvent(result.events, this.element, this.widget);
+        this.element.trigger('click');
+        this.element.trigger('save');
+        expect(this.spyClick).toHaveBeenCalled();
+        expect(this.spySave).toHaveBeenCalled();
+        expect(this.spyClick.calls.mostRecent().object).toBe(this.widget);
+        expect(this.spySave.calls.mostRecent().object).toBe(this.widget);
     });
+
 });

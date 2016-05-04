@@ -11,13 +11,12 @@ function VDOM(props, children) {
     this.props = props || {};
     this.children = children || [];
     this.key = null;
-    this.attributes = {};
-    this.events = {};
 }
 
 VDOM.prototype = {
-    parse: function () {
-        var props = this.props, attributes = {}, events = {}, propertyName;
+    parse: function (props) {
+        var attributes = {}, events = {}, propertyName;
+        props = props || this.props;
         for (propertyName in props) {
             if (props.hasOwnProperty(propertyName)) {
                 if (reventProperty.test(propertyName)) {
@@ -28,26 +27,26 @@ VDOM.prototype = {
                 }
             }
         }
-        this.attributes = attributes;
-        this.events = events;
+        return {
+            attributes: attributes,
+            events: events
+        };
     },
 
-    addEvent: function (element, widget) {
-        var events = this.events, eventName;
-        if (widget) {
-            var widgetEvents = {};
-            for (eventName in events) {
-                widgetEvents[eventName] = $.isFunction(events[eventName]) ? $.proxy(events[eventName], widget): events[eventName];
-            }
-            widget._on(element, widgetEvents);
-        }
-        else {
-            for (eventName in events) {
-                if (events.hasOwnProperty(eventName) && $.isFunction(events[eventName])) {
-                    element.on(eventName, events[eventName]);
+    addEvent: function (events, element, widget) {
+        var name, handler, widgetEvents = {};
+        for (name in events) {
+            if (events.hasOwnProperty(name)) {
+                handler = events[name];
+                if (handler === null) {
+                    widget._off(element, name);
+                }
+                else {
+                    widgetEvents[name] = $.isFunction(handler) ? $.proxy(handler, widget): handler;
                 }
             }
         }
+        widget._on(element, widgetEvents);
     }
 };
 
