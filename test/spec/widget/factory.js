@@ -58,9 +58,9 @@ describe( 'widget factory', function () {
     it( 'Anonymous widget', function () {
         var testWidget = createWidget();
         if ('name' in testWidget) {
-            expect(testWidget.name).toEqual(jasmine.stringMatching(/^Anonymous\d+$/));
+            expect(testWidget.name).toEqual(jasmine.stringMatching(/^anonymous\d+$/));
         }
-        expect(testWidget.prototype.widgetName).toEqual(jasmine.stringMatching(/^Anonymous\d+$/));
+        expect(testWidget.prototype.widgetName).toEqual(jasmine.stringMatching(/^anonymous\d+$/));
     });
 
     it( 'inheritance', function() {

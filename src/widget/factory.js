@@ -16,7 +16,7 @@ function widget( name, base, prototype ) {
     if (typeof name !== 'string') {
         prototype = base;
         base = name;
-        name = 'Anonymous' + (++anonymousWidgetIndex);
+        name = 'anonymous' + (++anonymousWidgetIndex);
     }
 
     if ( !prototype ) {

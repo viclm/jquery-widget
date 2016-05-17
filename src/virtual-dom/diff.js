@@ -31,22 +31,32 @@ diff.prototype = {
                 }
             }
             else if (oldTree.constructor === VNode) {
-                var diffProps = this.diffProps(oldTree.props, newTree.props);
-                if (diffProps) {
-                    patch.push({type: patchType.PROPS, node: newTree, props: diffProps});
+                if (oldTree.tagName !== newTree.tagName) {
+                    patch.push({type: patchType.REPLACE, node: newTree});
                 }
-                var diffChildren = this.diffChildren(oldTree.children, newTree.children);
-                if (diffChildren.move.length) {
-                    patch.push({type: patchType.REORDER, move: diffChildren.move});
-                }
-                for (var i = 0, len = oldTree.children.length ; i < len ; i++) {
-                    this.walk(oldTree.children[i], diffChildren.children[i])
+                else {
+                    var diffProps = this.diffProps(oldTree.props, newTree.props);
+                    if (diffProps) {
+                        patch.push({type: patchType.PROPS, node: newTree, props: diffProps});
+                    }
+                    var diffChildren = this.diffChildren(oldTree.children, newTree.children);
+                    if (diffChildren.move.length) {
+                        patch.push({type: patchType.REORDER, move: diffChildren.move});
+                    }
+                    for (var i = 0, len = oldTree.children.length ; i < len ; i++) {
+                        this.walk(oldTree.children[i], diffChildren.children[i])
+                    }
                 }
             }
             else if (oldTree.constructor === VWidget) {
-                var diffProps = this.diffProps(oldTree.props, newTree.props);//eslint-disable-line
-                if (diffProps) {
-                    patch.push({type: patchType.PROPS, node: newTree, props: diffProps});
+                if (oldTree.widget.prototype.getWidgetName() !== newTree.widget.prototype.getWidgetName()) {
+                    patch.push({type: patchType.REPLACE, node: newTree});
+                }
+                else {
+                    var diffProps = this.diffProps(oldTree.props, newTree.props);//eslint-disable-line
+                    if (diffProps) {
+                        patch.push({type: patchType.PROPS, node: newTree, props: diffProps});
+                    }
                 }
             }
         }

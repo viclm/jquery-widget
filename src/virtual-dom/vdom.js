@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var md5 = require('blueimp-md5');
 
 var reventProperty = /^on/;
 
@@ -7,13 +8,34 @@ var attrfix = {
     htmlfor: 'for'
 };
 
+var toString = function (obj) {
+    if (!obj) {
+        return '';
+    }
+    var str = [], key, value;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            value = obj[key];
+            str.push(key);
+            str.push(typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? value : value.toString());
+        }
+    }
+    return str.join('');
+};
+
+var delimiter = '|';
+
 function VDOM(props, children) {
     this.props = props || {};
     this.children = children || [];
-    this.key = null;
 }
 
 VDOM.prototype = {
+    makeKey: function (factor) {
+        return md5(factor + delimiter + toString(this.props) + delimiter + $.map(this.children, function (child) {
+            return child.key;
+        }).join(delimiter));
+    },
     parse: function (props) {
         var attributes = {}, events = {}, propertyName;
         props = props || this.props;

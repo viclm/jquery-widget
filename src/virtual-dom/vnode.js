@@ -12,6 +12,7 @@ function VNode(tagName, props, children) {
         }
         return child;
     });
+    this.key = this.makeKey(tagName);
 }
 
 inherit(VNode, VDOM);

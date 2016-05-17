@@ -1,47 +1,22 @@
 var $ = require('jquery');
 var extend = require('../util/extend');
-var md5 = require('blueimp-md5');
 var vd = require('../virtual-dom');
 require('./helper');
 
 var rfunctionName = /\bfunction(?:\s+([\w$]+))?\s*\(/;
-
-var toString = function (obj) {
-    if (!obj) {
-        return '';
-    }
-    var str = [], key, value;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            value = obj[key];
-            str.push(key);
-            str.push(typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? value : value.toString());
-        }
-    }
-    return str.join('');
-};
 
 var anonymousWidgetIndex = 0;
 var widgetUuid = 0;
 
 function Widget(options) {
     if (this._createWidget) {
-        if (this.widgetName === 'Widget') {
-            var widgetName;
-            if (Function.name) {
-                widgetName = this.constructor.name;
-            }
-            else {
-                widgetName = this.constructor.toString().match(rfunctionName)[1];
-            }
-            this.widgetName = widgetName || 'Anonymous' + (++anonymousWidgetIndex);
-        }
+        this.getWidgetName();
         this._createWidget(options);
     }
 }
 
 Widget.prototype = {
-    widgetName: "Widget",
+    widgetName: null,
     defaultElement: "<div>",
 
     options: {
@@ -52,13 +27,26 @@ Widget.prototype = {
         create: null
     },
 
+    getWidgetName: function () {
+        if (!this.widgetName) {
+            var widgetName;
+            if (Function.name) {
+                widgetName = this.constructor.name;
+            }
+            else {
+                widgetName = this.constructor.toString().match(rfunctionName)[1];
+            }
+            this.widgetName = widgetName || 'Anonymous' + (++anonymousWidgetIndex);
+        }
+        return this.widgetName;
+    },
+
     createWidget: function (widget, props, children) {
         children = Array.prototype.slice.call(arguments, 2);
         children = $.grep(children, function (child) {
             return typeof child !== 'undefined';
         });
         var vdom = new vd[(typeof widget === 'string' ? 'VNode' : 'VWidget')](widget, props, children);
-        vdom.key = md5(this.widgetName + widget.toString() + toString(props));
         return vdom;
     },
 

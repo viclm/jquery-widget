@@ -4,6 +4,7 @@ var inherit = require('../util/inherit');
 function VWidget(widget, props) {
     VDOM.call(this, props);
     this.widget = widget;
+    this.key = this.makeKey(widget.prototype.getWidgetName());
 }
 
 inherit(VWidget, VDOM);
