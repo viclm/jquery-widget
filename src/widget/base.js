@@ -4,7 +4,7 @@ var md5 = require('blueimp-md5');
 var vd = require('../virtual-dom');
 require('./helper');
 
-var rfunctionName = /^\s*at\snew\s([\w$]*)/m;
+var rfunctionName = /\bfunction(?:\s+([\w$]+))?\s*\(/;
 
 var toString = function (obj) {
     if (!obj) {
@@ -27,12 +27,14 @@ var widgetUuid = 0;
 function Widget(options) {
     if (this._createWidget) {
         if (this.widgetName === 'Widget') {
-            try {
-                throw new Error();
+            var widgetName;
+            if (Function.name) {
+                widgetName = this.constructor.name;
             }
-            catch (e) {
-                this.widgetName = e.stack.match(rfunctionName)[1] || 'Anonymous' + (++anonymousWidgetIndex);
+            else {
+                widgetName = this.constructor.toString().match(rfunctionName)[1];
             }
+            this.widgetName = widgetName || 'Anonymous' + (++anonymousWidgetIndex);
         }
         this._createWidget(options);
     }
