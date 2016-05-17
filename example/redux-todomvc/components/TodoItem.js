@@ -1,16 +1,18 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import classnames from 'classnames'
 import TodoTextInput from './TodoTextInput'
 
-const TodoItem = createWidget('TodoItem', {
+class TodoItem extends Widget {
 
-  options: {
-    editing: false
-  },
+  _getCreateOptions() {
+    return {
+       editing: false
+    }
+  }
 
   handleDoubleClick() {
     this.option({ editing: true })
-  },
+  }
 
   handleSave(id, text) {
     if (text.length === 0) {
@@ -19,7 +21,7 @@ const TodoItem = createWidget('TodoItem', {
       this.options.editTodo(id, text)
     }
     this.option({ editing: false })
-  },
+  }
 
   render() {
     const { todo, completeTodo, deleteTodo } = this.options
@@ -56,6 +58,6 @@ const TodoItem = createWidget('TodoItem', {
       </li>
     )
   }
-})
+}
 
 export default TodoItem

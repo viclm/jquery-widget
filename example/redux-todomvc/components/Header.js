@@ -1,13 +1,13 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import TodoTextInput from './TodoTextInput'
 
-const Header = createWidget('Header', {
+class Header extends Widget {
   handleSave(e, ui) {
     let text = ui.text
     if (text.length !== 0) {
       this.options.addTodo(text)
     }
-  },
+  }
   
   render() {
     return (
@@ -19,6 +19,6 @@ const Header = createWidget('Header', {
       </header>
     )
   }  
-})
+}
 
 export default Header

@@ -1,33 +1,33 @@
-var $ = require('jquery');
-var Widget = require('../../../src/widget/base');
+import $ from 'jquery';
+import Widget from '../../../src/widget/base';
 
-describe('Widget base class', function () {
+describe('Widget class', function () {
 
-    var instance = null, proto = Widget.prototype;
+    var proto = Widget.prototype;
 
     beforeEach(function () {
-        instance = new Widget();
+        class TestWidget extends Widget {}
+        this.TestWidget = TestWidget;
     });
 
-    afterEach(function () {
-        instance = null;
+    it( 'widget name', function () {
+        var instance = new this.TestWidget();
+        expect(instance.widgetName).toBe('TestWidget');
     });
 
     it( '._getCreateOptions()', function() {
-        $.extend( instance, {
-            options: {
-                option1: 'valuex',
-                option2: 'valuex',
-                option3: 'value3'
-            },
-            _getCreateOptions: function() {
-                return {
-                    option1: 'override1',
-                    option2: 'overideX'
-                };
-            }
-        } );
-        instance._createWidget( { option2: 'value2' } );
+        this.TestWidget.prototype.options = {
+            option1: 'valuex',
+            option2: 'valuex',
+            option3: 'value3'
+        };
+        this.TestWidget.prototype._getCreateOptions = function() {
+            return {
+                option1: 'override1',
+                option2: 'overideX'
+            };
+        };
+        var instance = new this.TestWidget( { option2: 'value2' } );
         expect(instance.option()).toEqual({
             option1: 'override1',
             option2: 'value2',
@@ -37,12 +37,11 @@ describe('Widget base class', function () {
 
     it( '._getCreateEventData()', function() {
         var data = { foo: 'bar' };
-        $.extend( instance, {
-            _getCreateEventData: function() {
-                return data;
-            }
-        } );
-        instance._createWidget( {
+        this.TestWidget.prototype._getCreateEventData = function() {
+            return data;
+        };
+        var instance = new this.TestWidget();
+        var instance = new this.TestWidget( {
             create: function( event, ui ) {
                 expect(ui).toBe(data);
             }
@@ -50,30 +49,30 @@ describe('Widget base class', function () {
     } );
 
     it ( 'element normalization', function() {
-        instance._create = function() {
+        this.TestWidget.prototype._create = function() {
             expect(this.element.is( 'div' )).toBeTruthy();
-            expect(this.element.data('widget')).toBe('Widget');
-            expect(this.element.data('widget-Widget')).toBe(this);
+            expect(this.element.data('widget')).toBe('TestWidget');
+            expect(this.element.data('widget-TestWidget')).toBe(this);
         };
-        instance._createWidget();
+        new this.TestWidget();
 
-        instance.defaultElement = '<span data-test="pass"></span>';
-        instance._create = function() {
+        this.TestWidget.prototype.defaultElement = '<span data-test="pass"></span>';
+        this.TestWidget.prototype._create = function() {
             expect(this.element.is( 'span[data-test=pass]' )).toBeTruthy();
         };
-        instance._createWidget();
+        new this.TestWidget();
 
-        instance._create = function() {
+        this.TestWidget.prototype._create = function() {
             expect(this.element.is( 'span[data-test=render]' )).toBeTruthy();
         };
-        instance.render = function () {
+        this.TestWidget.prototype.render = function () {
             return this.createWidget('span', {'data-test': 'render'});
         };
-        instance._createWidget();
+        new this.TestWidget();
     } );
 
     it('getter', function() {
-        instance._createWidget({
+        var instance = new this.TestWidget({
             foo: 'bar',
             baz: 5,
             qux: ['quux', 'quuux']
@@ -98,7 +97,7 @@ describe('Widget base class', function () {
     });
 
     it('deep option getter', function() {
-        instance._createWidget({
+        var instance = new this.TestWidget({
             foo: {
                 bar: 'baz',
                 qux: {
@@ -115,7 +114,7 @@ describe('Widget base class', function () {
     });
 
     it('delegate to ._setOptions()', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
 
         spyOn(proto, '_setOptions');
 
@@ -134,7 +133,7 @@ describe('Widget base class', function () {
     });
 
     it('delegate to ._setOption()', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
 
         spyOn(proto, '_setOption');
 
@@ -158,7 +157,7 @@ describe('Widget base class', function () {
     });
 
     it('deep option setter', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         spyOn(proto, '_setOption');
         function deepOption(from, to, fn) {
             instance.options.foo = from;
@@ -184,26 +183,27 @@ describe('Widget base class', function () {
     });
 
     it('.enable()', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         spyOn(proto, '_setOption');
         instance.enable();
         expect(proto._setOption).toHaveBeenCalledWith('disabled', false);
     });
 
     it('.disable()', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         spyOn(proto, '_setOption');
         instance.disable();
         expect(proto._setOption).toHaveBeenCalledWith('disabled', true);
     });
 
     it('._setOptionDisabled()', function() {
+        var instance;
         spyOn(proto, '_setOptionDisabled');
 
-        instance._createWidget();
+        instance = new this.TestWidget();
         expect(proto._setOptionDisabled).not.toHaveBeenCalled();
 
-        instance._createWidget({ disabled: true });
+        instance = new this.TestWidget({ disabled: true });
         expect(proto._setOptionDisabled).toHaveBeenCalledWith(true);
 
         instance.enable();
@@ -214,7 +214,7 @@ describe('Widget base class', function () {
     });
 
     it( '._on() to element (default)', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 this._on({
                     keyup: this.keyup,
@@ -250,8 +250,7 @@ describe('Widget base class', function () {
             }
         };
 
-        instance._createWidget();
-
+        var instance = new this.TestWidget();
         var element = instance.element, event;
 
         eventExpector('keyup');
@@ -271,7 +270,7 @@ describe('Widget base class', function () {
     });
 
     it('._on() to element with suppressDisabledCheck', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 this._on(true, {
                     keyup: this.keyup,
@@ -306,8 +305,7 @@ describe('Widget base class', function () {
             }
         };
 
-        instance._createWidget();
-
+        var instance = new this.TestWidget();
         var element = instance.element, event;
 
         eventExpector('keyup');
@@ -327,7 +325,7 @@ describe('Widget base class', function () {
     });
 
     it('._on() to descendent', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 this._on(this.element.find('strong'), {
                     keyup: this.keyup,
@@ -368,8 +366,7 @@ describe('Widget base class', function () {
             }
         };
 
-        instance._createWidget();
-
+        var instance = new this.TestWidget();
         var element = instance.element;
         var descendant = element.find('strong');
         var event;
@@ -408,7 +405,7 @@ describe('Widget base class', function () {
     });
 
     it('_on() with delegate', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 var uuid = this.uuid;
                 this.element = {
@@ -428,23 +425,23 @@ describe('Widget base class', function () {
                     'click a': 'handler'
                 });
                 expect(this.element.on.calls.count()).toBe(1);
-                expect(this.element.on).toHaveBeenCalledWith('click.Widget' + uuid, jasmine.any(Function));
+                expect(this.element.on).toHaveBeenCalledWith('click.TestWidget' + uuid, jasmine.any(Function));
                 expect(this.widgetElement.on.calls.count()).toBe(1);
-                expect(this.widgetElement.on).toHaveBeenCalledWith('click.Widget' + uuid, 'a', jasmine.any(Function));
+                expect(this.widgetElement.on).toHaveBeenCalledWith('click.TestWidget' + uuid, 'a', jasmine.any(Function));
 
                 this._on({
                     'change form fieldset > input': 'handler'
                 });
                 expect(this.element.on.calls.count()).toBe(1);
                 expect(this.widgetElement.on.calls.count()).toBe(2);
-                expect(this.widgetElement.on).toHaveBeenCalledWith('change.Widget' + uuid, 'form fieldset > input', jasmine.any(Function));                   
+                expect(this.widgetElement.on).toHaveBeenCalledWith('change.TestWidget' + uuid, 'form fieldset > input', jasmine.any(Function));                   
             }
         });
-        instance._createWidget();
+        new this.TestWidget();
     });
 
     it('_on() with delegate to descendent', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 this.target = $('<p><strong>hello</strong> world</p>');
                 this.child = this.target.children();
@@ -463,11 +460,11 @@ describe('Widget base class', function () {
                 expect(event.target).toBe(this.child[0]);
             }
         });
-        instance._createWidget();
+        new this.TestWidget();
     });
 
     it( '_on() to common element', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 this._on(this.document, {
                     'customevent': '_handler',
@@ -481,7 +478,7 @@ describe('Widget base class', function () {
             _dashHandler: function() {},
             _commbinedHandler: function() {}
         });
-        instance._createWidget();
+        var instance = new this.TestWidget();
         spyOn(instance, '_handler');
         spyOn(instance, '_colonHandler');
         spyOn(instance, '_dashHandler');
@@ -510,7 +507,7 @@ describe('Widget base class', function () {
     });
 
     it( '_off() - single event', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         var element = $('<div>');
         var spyFooWidget = jasmine.createSpy('fooWidget');
         var spyFooElement = jasmine.createSpy('fooElement');
@@ -529,7 +526,7 @@ describe('Widget base class', function () {
     } );
 
     it('_off() - multiple events', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         var element = $('<div>');
         var spyFooWidget = jasmine.createSpy('fooWidget');
         var spyBarWidget = jasmine.createSpy('barWidget');
@@ -553,7 +550,7 @@ describe('Widget base class', function () {
     });
 
     it( '_off() - all events', function() {
-        instance._createWidget();
+        var instance = new this.TestWidget();
         var element = $('<div>');
         var spyFooWidget = jasmine.createSpy('fooWidget');
         var spyBarWidget = jasmine.createSpy('barWidget');
@@ -580,12 +577,12 @@ describe('Widget base class', function () {
         var spyListener = jasmine.createSpy('listener');
         var spyCallback = jasmine.createSpy('callback');
 
-        instance._createWidget({foo: spyCallback});
+        var instance = new this.TestWidget({foo: spyCallback});
         instance.element.appendTo(document.body);
 
-        $(document).add(instance.element).on('widget:foo', spyListener);
+        $(document).add(instance.element).on('testwidget:foo', spyListener);
         expect(instance._trigger('foo')).toBeTruthy();
-        expect(spyCallback).toHaveBeenCalledWith(jasmine.objectContaining({type: 'widget:foo'}), {});
+        expect(spyCallback).toHaveBeenCalledWith(jasmine.objectContaining({type: 'testwidget:foo'}), {});
         expect(spyCallback.calls.mostRecent().object).toBe(instance.element[0]);
         expect(spyListener.calls.count()).toBe(2);
         expect(spyListener.calls.mostRecent().object).toBe(document);
@@ -599,8 +596,8 @@ describe('Widget base class', function () {
         var spyListener = jasmine.createSpy('listener').and.returnValue(false);
         var spyCallback = jasmine.createSpy('callback');
 
-        instance._createWidget({foo: spyCallback});
-        instance.element.on('widget:foo', spyListener);
+        var instance = new this.TestWidget({foo: spyCallback});
+        instance.element.on('testwidget:foo', spyListener);
 
         expect(instance._trigger('foo')).toBeFalsy();
         expect(spyListener).toHaveBeenCalled();
@@ -608,7 +605,7 @@ describe('Widget base class', function () {
     });
 
     it('._trigger() - cancelled callback', function() {
-        instance._createWidget({
+        var instance = new this.TestWidget({
             foo: function() {
                 return false;
             }
@@ -619,7 +616,7 @@ describe('Widget base class', function () {
 
     it('._trigger() - provide event and ui', function() {
         var originalEvent = $.Event('originalTest');
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             testEvent: function() {
                 var ui = {
                     foo: 'bar',
@@ -638,7 +635,7 @@ describe('Widget base class', function () {
                 });
             }
         });
-        instance._createWidget({
+        var instance = new this.TestWidget({
             foo: function (event, ui) {
                 expect(event).toEqual(jasmine.objectContaining({originalEvent: originalEvent}));
                 expect(ui).toEqual({
@@ -651,7 +648,7 @@ describe('Widget base class', function () {
                 ui.baz.quux = 'jQuery';
             }
         });
-        instance.element.on('widget:foo', function (event, ui) {
+        instance.element.on('testwidget:foo', function (event, ui) {
             expect(event).toEqual(jasmine.objectContaining({originalEvent: originalEvent}));
             expect(ui).toEqual({
                 foo: 'bar',
@@ -670,7 +667,7 @@ describe('Widget base class', function () {
     it( '._trigger() - array as ui', function() {
         var spyListener = jasmine.createSpy('listener');
         var spyCallback = jasmine.createSpy('callback');
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             testEvent: function() {
                 var ui = {
                     foo: 'bar',
@@ -685,8 +682,8 @@ describe('Widget base class', function () {
                 this._trigger('foo', null, [ui, extra]);
             }
         });
-        instance._createWidget({foo: spyCallback});
-        instance.element.on('widget:foo', spyListener);
+        var instance = new this.TestWidget({foo: spyCallback});
+        instance.element.on('testwidget:foo', spyListener);
         instance.testEvent();
         expect(spyCallback).toHaveBeenCalledWith(
             jasmine.any(Object),
@@ -717,7 +714,7 @@ describe('Widget base class', function () {
     });
 
     it('_delay', function() {
-        $.extend(instance, {
+        $.extend(this.TestWidget.prototype, {
             _create: function() {
                 jasmine.clock().install();
 
@@ -748,7 +745,7 @@ describe('Widget base class', function () {
             },
             callback: function() {}
         });
-        instance._createWidget();
+        var instance = new this.TestWidget();
     });
 
     xit('._hoverable()', function() {
@@ -818,7 +815,7 @@ describe('Widget base class', function () {
         beforeEach(function () {
             var self = this;
             this.destroyed = false;
-            $.extend(instance, {
+            $.extend(this.TestWidget.prototype, {
                 destroy: function() {
                     self.destroyed = true;
                 },
@@ -831,40 +828,40 @@ describe('Widget base class', function () {
 
 
         it('auto-destroy - .remove()', function() {
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.remove();
             expect(this.destroyed).toBeTruthy();
         });
 
         it('auto-destroy - .remove() when disabled', function() {
-            instance._createWidget({ disabled: true });
+            var instance = new this.TestWidget({ disabled: true });
             instance.element.remove();
             expect(this.destroyed).toBeTruthy();
         });
 
         it('auto-destroy - .remove() on parent', function() {
             var parent = $('<div>').appendTo(document.body);
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.appendTo(parent);
             parent.remove();
             expect(this.destroyed).toBeTruthy();
         });
 
         it('auto-destroy - .remove() on child', function() {
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.children().remove();
             expect(this.destroyed).toBeFalsy();
         });
 
         it('auto-destroy - .empty()', function() {
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.empty();
             expect(this.destroyed).toBeFalsy();
         });
 
         it('auto-destroy - .empty() on parent', function() {
             var parent = $('<div>').appendTo(document.body);
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.appendTo(parent);
             parent.empty();
             expect(this.destroyed).toBeTruthy();
@@ -872,13 +869,13 @@ describe('Widget base class', function () {
         });
 
         it('auto-destroy - .detach()', function() {
-            instance._createWidget();
+            var instance = new this.TestWidget();
             instance.element.detach();
             expect(this.destroyed).toBeFalsy();
         });
 
         it('destroy - remove event bubbling', function() {
-            instance._createWidget();
+            var instance = new this.TestWidget();
             $('<div>child</div>').appendTo(instance.element).trigger('remove');
             expect(this.destroyed).toBeFalsy();
         });

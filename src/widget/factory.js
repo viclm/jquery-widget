@@ -2,12 +2,22 @@ var $ = require('jquery');
 var extend = require('../util/extend');
 var Widget = require('./base');
 
+var anonymousWidgetIndex = 0;
+
 function widget( name, base, prototype ) {
-    var constructor, basePrototype;
+    var constructor, basePrototype, globalVarBak;
+
+    var bridge = function () {};
 
     // ProxiedPrototype allows the provided prototype to remain unmodified
     // so that it can be used as a mixin for multiple widgets (#8876)
     var proxiedPrototype = {};
+
+    if (typeof name !== 'string') {
+        prototype = base;
+        base = name;
+        name = 'Anonymous' + (++anonymousWidgetIndex);
+    }
 
     if ( !prototype ) {
         prototype = base;
@@ -18,7 +28,7 @@ function widget( name, base, prototype ) {
         prototype = $.extend.apply( null, [ {} ].concat( prototype ) );
     }
 
-    var bak = window[name];
+    globalVarBak = window[name];
 
     window.eval([
     'window.'+name+' = function '+name+'( options ) {',
@@ -26,11 +36,7 @@ function widget( name, base, prototype ) {
         'if ( !this._createWidget ) {',
         '    return new '+name+'( options );',
         '}',
-        // Allow instantiation without initializing for simple inheritance
-        // must use "new" keyword (the code above always passes args)
-        'if ( arguments.length ) {',
-            'this._createWidget( options );',
-        '}',
+        'this._createWidget( options );',
     '};'
     ].join(''));
 
@@ -40,10 +46,11 @@ function widget( name, base, prototype ) {
         delete window[name];
     }
     else {
-        window[name] = bak;
+        window[name] = globalVarBak;
     }
 
-    basePrototype = new base();
+    bridge.prototype = base.prototype;
+    basePrototype = new bridge();
 
     // We need to make the options hash a property directly on the new instance
     // otherwise we'll modify the options hash on the prototype that we're

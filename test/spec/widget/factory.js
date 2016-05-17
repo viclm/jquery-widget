@@ -17,6 +17,7 @@ describe( 'widget factory', function () {
         if ('name' in testWidget) {
             expect(testWidget.name).toBe('testWidget');
         }
+        expect(testWidget.prototype.widgetName).toBe('testWidget');
         expect(testWidget.prototype).toEqual(jasmine.any(Object));
         expect(testWidget.prototype._create()).toBe('_create');
         expect(testWidget.prototype.creationTest()).toBe('creationTest');
@@ -53,6 +54,14 @@ describe( 'widget factory', function () {
         instance.getterSetterMethod( 30 );
         expect(instance.getterSetterVal).toBe(30);
     } );
+
+    it( 'Anonymous widget', function () {
+        var testWidget = createWidget();
+        if ('name' in testWidget) {
+            expect(testWidget.name).toEqual(jasmine.stringMatching(/^Anonymous\d+$/));
+        }
+        expect(testWidget.prototype.widgetName).toEqual(jasmine.stringMatching(/^Anonymous\d+$/));
+    });
 
     it( 'inheritance', function() {
 

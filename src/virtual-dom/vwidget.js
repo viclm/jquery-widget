@@ -21,8 +21,9 @@ VWidget.prototype.parse = function (widgetName, props) {
 };
 
 VWidget.prototype.render = function (parentWidget) {
-    var result = this.parse(this.widget.prototype.widgetName);
-    var element = this.widget(this.props).element;
+    var widget = new this.widget(this.props);
+    var element = widget.element;
+    var result = this.parse(widget.widgetName);
     this.addEvent(result.events, element, parentWidget);
     return element;
 };

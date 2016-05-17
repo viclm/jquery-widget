@@ -1,4 +1,4 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import classnames from 'classnames'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters'
 
@@ -8,7 +8,7 @@ const FILTER_TITLES = {
   [SHOW_COMPLETED]: 'Completed'
 }
 
-const Footer = createWidget('Footer', {
+class Footer extends Widget {
   renderTodoCount() {
     const { activeCount } = this.options
     const itemWord = activeCount === 1 ? 'item' : 'items'
@@ -18,7 +18,7 @@ const Footer = createWidget('Footer', {
         <strong>{activeCount || 'No'}</strong> {itemWord} left
       </span>
     )
-  },
+  }
 
   renderFilterLink(filter) {
     const title = FILTER_TITLES[filter]
@@ -31,7 +31,7 @@ const Footer = createWidget('Footer', {
         {title}
       </a>
     )
-  },
+  }
 
   renderClearButton() {
     const { completedCount } = this.options
@@ -43,7 +43,7 @@ const Footer = createWidget('Footer', {
         </button>
       )
     }
-  },
+  }
 
   render() {
     return (
@@ -62,6 +62,6 @@ const Footer = createWidget('Footer', {
       </footer>
     )
   }
-})
+}
 
 export default Footer

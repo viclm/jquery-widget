@@ -1,4 +1,4 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import TodoItem from './TodoItem'
 import Footer from './Footer'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters'
@@ -9,19 +9,21 @@ const TODO_FILTERS = {
   [SHOW_COMPLETED]: todo => todo.completed
 }
 
-const MainSection = createWidget('MainSection', {
-
-  options: {
-    filter: SHOW_ALL  
-  },
+class MainSection extends Widget {
+  
+  _getCreateOptions() {
+    return {
+      filter: SHOW_ALL
+    }
+  }
 
   handleClearCompleted() {
     this.options.actions.clearCompleted()
-  },
+  }
 
   handleShow(e, ui) {
     this.option({ filter: ui.filter })
-  },
+  }
 
   renderToggleAll(completedCount) {
     const { todos, actions } = this.options
@@ -33,7 +35,7 @@ const MainSection = createWidget('MainSection', {
                onchange={actions.completeAll} />
       )
     }
-  },
+  }
 
   renderFooter(completedCount) {
     const { todos } = this.options
@@ -49,7 +51,7 @@ const MainSection = createWidget('MainSection', {
                 onshow={this.handleShow} />
       )
     }
-  },
+  }
 
   render() {
     const { todos, actions, filter } = this.options
@@ -72,6 +74,6 @@ const MainSection = createWidget('MainSection', {
       </section>
     )
   }
-})
+}
 
 export default MainSection

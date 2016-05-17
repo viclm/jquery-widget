@@ -4,6 +4,8 @@ var md5 = require('blueimp-md5');
 var vd = require('../virtual-dom');
 require('./helper');
 
+var rfunctionName = /^\s*at\snew\s([\w$]*)/m;
+
 var toString = function (obj) {
     if (!obj) {
         return '';
@@ -19,9 +21,22 @@ var toString = function (obj) {
     return str.join('');
 };
 
+var anonymousWidgetIndex = 0;
 var widgetUuid = 0;
 
-function Widget() {}
+function Widget(options) {
+    if (this._createWidget) {
+        if (this.widgetName === 'Widget') {
+            try {
+                throw new Error();
+            }
+            catch (e) {
+                this.widgetName = e.stack.match(rfunctionName)[1] || 'Anonymous' + (++anonymousWidgetIndex);
+            }
+        }
+        this._createWidget(options);
+    }
+}
 
 Widget.prototype = {
     widgetName: "Widget",

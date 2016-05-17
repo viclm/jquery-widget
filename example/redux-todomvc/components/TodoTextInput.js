@@ -1,11 +1,13 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import classnames from 'classnames'
 
-const TodoTextInput = createWidget('TodoTextInput', {
+class TodoTextInput extends Widget {
 
-  options: {
-    text: ''
-  },
+  _getCreateOptions() {
+    return {
+      text: ''
+    }
+  }
 
   handleSubmit(e) {
     const text = e.target.value.trim()
@@ -15,17 +17,17 @@ const TodoTextInput = createWidget('TodoTextInput', {
         this.option({ text: '' })
       }
     }
-  },
+  }
 
   handleChange(e) {
     this.options.text = e.target.value
-  },
+  }
 
   handleBlur(e) {
     if (!this.options.newTodo) {
       this._trigger('save', null, {text: e.target.value})
     }
-  },
+  }
 
   render() {
     return (
@@ -43,6 +45,6 @@ const TodoTextInput = createWidget('TodoTextInput', {
         onkeydown={this.handleSubmit} />
     )
   }
-})
+}
 
 export default TodoTextInput

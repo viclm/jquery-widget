@@ -1,8 +1,8 @@
-import createWidget from 'jquery-widget'
+import { Widget } from 'jquery-widget'
 import Header from '../components/Header'
 import MainSection from '../components/MainSection'
 
-const App = createWidget('App', {
+class App extends Widget {
    render() {
     const { todos, actions } = this.options
     return (
@@ -12,6 +12,6 @@ const App = createWidget('App', {
       </div>
     )
   }
-})
+}
 
 export default App
