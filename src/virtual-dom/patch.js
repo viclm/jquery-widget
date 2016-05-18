@@ -6,6 +6,7 @@ function patch(node, patches) {
         return new patch(node, patches);
     }
     this.root = node;
+    this.widget = this.root.data('widget-' + this.root.data('widget'));
     this.patches = patches;
     this.index = -1;
     this.walk(node[0]);
@@ -26,40 +27,74 @@ patch.prototype = {
         }
     },
 
-    applyPatch: function (node, patch) {
-        var widget = this.root.data('widget-' + this.root.data('widget'));
-        $.each(patch, function (i, p) {
-            switch (p.type) {
+    applyPatch: function (node, patches) {
+        for (var i = 0, len = patches.length, patch ; i < len ; i++) {
+            patch = patches[i];
+            switch (patch.type) {
                 case patchType.PROPS:
-                    p.node.update(p.props, $(node), widget);
+                    this.patchProps(node, patch.node, patch.props);
                     break;
                 case patchType.REORDER:
-                    var siblings = node.childNodes;
-                    $.each(p.move, function (i, p) {
-                        if (p.type === patchType.INSERT) {
-                            var originNode = node.childNodes[p.index];
-                            if (originNode) {
-                                node.insertBefore(p.node.render(widget)[0]);
-                            }
-                            else {
-                                node.appendChild(p.node.render(widget)[0]);
-                            }
-                        }
-                        else if (p.type === patchType.REMOVE) {
-                            node.removeChild(siblings[p.index]);
-                        }
-                    });
+                    this.patchReorder(node, patch.move);
                     break;
                 case patchType.REPLACE:
-                    if (node.nodeType === 3) {
-                        node.parentNode.appendChild(p.node.render(widget)[0]);
-                    }
-                    else {
-                        node.replaceWith(p.node.render(widget));
-                    }
+                    this.patchReplace(node, patch.node);
                     break;
             }
-        });
+        }
+    },
+
+    patchProps: function (node, vdom, props) {
+        vdom.update(props, $(node), this.widget);
+    },
+
+    patchReorder: function (node, move) {
+        var childNodes = Array.prototype.slice.call(node.childNodes, 0);
+        var remove = [], insert = [], tmp = [];
+        var i, len, item;
+        for (i = 0, len = move.length ; i < len ; i++) {
+            item = move[i];
+            if (item.type === patchType.REMOVE) {
+                remove.push({method: 'removeChild', args: [childNodes[item.index]]});
+                childNodes.splice(item.index, 1, null);
+            }
+            else if (item.type === patchType.INSERT) {
+                insert.push(item);
+            }
+        }
+        for (i = 0, len = childNodes.length ; i < len ; i++) {
+            item = childNodes[i];
+            if (item !== null) {
+                tmp.push(item);
+            }
+        }
+        childNodes = tmp;
+        for (i = 0, len = insert.length ; i < len ; i++) {
+            item = insert[i].node.render(this.widget)[0];
+            if (childNodes[insert[i].index]) {
+                insert[i] = {method: 'insertBefore', args: [item, childNodes[insert[i].index]]};
+            }
+            else {
+                insert[i] = {method: 'appendChild', args: [item]};
+            }
+        }
+        tmp = remove.concat(insert);
+        for (i = 0, len = tmp.length ; i < len ; i++) {
+            item = tmp[i];
+            node[item.method].apply(node, item.args);
+        }
+    },
+
+    patchReplace: function (node, vdom) {
+        var newNode = vdom.render(this.widget)[0];
+        if (node.nodeType === 3) {
+            node.parentNode.innerHTML = '';
+            node.parentNode.appendChild(newNode);
+        }
+        else {
+            node.parentNode.insertBefore(newNode, node);
+            node.parentNode.removeChild(node);
+        }
     }
 };
 

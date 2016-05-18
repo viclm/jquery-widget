@@ -99,11 +99,9 @@ diff.prototype = {
             }
             return hash;
         };
-        var oldIndex = getIndex(oldChildren);
         var newIndex = getIndex(newChildren);
-        var move = [];
-        var children = [], transChildren = [], transRepeat = {};
-        var i, len, node;
+        var move = [], children = [], transChildren = [], inserted = {};
+        var i, len, node, j;
         for (i = 0, len = oldChildren.length ; i < len ; i++) {
             node = oldChildren[i];
             if (newIndex[node.key] > -1) {
@@ -114,26 +112,24 @@ diff.prototype = {
                 move.push({type: patchType.REMOVE, index: i});
             }
         }
+        j = 0;
         for (i = 0, len = newChildren.length ; i < len ; i++) {
             node = newChildren[i];
-            if (transRepeat[node.key]) {
-                transRepeat[node.key] = false;
-                transChildren.splice(i, 1);
-            }
-            if (transChildren[i]) {
-                if (node.key === transChildren[i].key) {
+            if (transChildren[j]) {
+                if (node.key === transChildren[j].key) {
+                    j++;
+                    while (transChildren[j] && inserted[transChildren[j].key]) {
+                        j++
+                    }
                     continue;
                 }
                 else {
-                    move.push({type: patchType.INSERT, node: node, index: i});
-                    if (oldIndex[node.key] > -1) {
-                        transChildren.splice(i, 0, node);
-                        transRepeat[node.key] = true;
-                    }
+                    move.push({type: patchType.INSERT, node: node, index: j});
+                    inserted[node.key] = true;
                 }
             }
             else {
-                move.push({type: patchType.INSERT, node: node, index: i});
+                move.push({type: patchType.INSERT, node: node, index: j});
             }
         }
 
