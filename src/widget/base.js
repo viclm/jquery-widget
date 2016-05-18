@@ -62,6 +62,7 @@ Widget.prototype = {
         this.classesElementLookup = {};
         this.uuid = widgetUuid++;
         this.eventNamespace = "." + this.widgetName + this.uuid;
+        this.subWidgets = [];
 
         this.vtree = this.render();
         this.element = this.vtree ? this.vtree.render(this) : $(this.defaultElement);
@@ -126,11 +127,9 @@ Widget.prototype = {
         // Clean up events and states
         this.bindings.off( this.eventNamespace );
 
-        $.each(this._subWidgets, function (name, instance) {
+        $.each(this.subWidgets, function (index, instance) {
             instance.destroy();
         });
-
-        this._subWidgets = null;
     },
 
     _destroy: $.noop,

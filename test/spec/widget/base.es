@@ -817,6 +817,7 @@ describe('Widget class', function () {
             this.destroyed = false;
             $.extend(this.TestWidget.prototype, {
                 destroy: function() {
+                    Widget.prototype.destroy.call(this);
                     self.destroyed = true;
                 },
                 render: function () {
@@ -878,6 +879,18 @@ describe('Widget class', function () {
             var instance = new this.TestWidget();
             $('<div>child</div>').appendTo(instance.element).trigger('remove');
             expect(this.destroyed).toBeFalsy();
+        });
+
+        it('destroy - destroy subwidgets', function () {
+            var spy = jasmine.createSpy('spy');
+            class subWidget extends Widget {}
+            subWidget.prototype.destroy = spy;
+            this.TestWidget.prototype.render = function () {
+                return this.createWidget('div', null, this.createWidget(subWidget));
+            }
+            var instance = new this.TestWidget();
+            instance.destroy();
+            expect(spy).toHaveBeenCalled();
         });
 
     });
