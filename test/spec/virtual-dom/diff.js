@@ -133,5 +133,19 @@ describe('diff', function () {
         expect(diffs[0]).toEqual([{type: patchType.PROPS, node: newTree, props: {foo: null, bar: 'bar'}}]);
     });
 
+    it('vtext vs vnode vs vwidget', function () {
+        var vtext = new VText('foo');
+        var vnode = new VNode('div');
+        var vwidget = new VWidget(createWidget({}));
+
+        var diffsTN = diff(vtext, vnode).patches;
+        var diffsTW = diff(vtext, vwidget).patches;
+        var diffsNW = diff(vnode, vwidget).patches;
+
+        expect(diffsTN[0]).toEqual([{type: patchType.REPLACE, node: vnode}]);
+        expect(diffsTW[0]).toEqual([{type: patchType.REPLACE, node: vwidget}]);
+        expect(diffsNW[0]).toEqual([{type: patchType.REPLACE, node: vwidget}]);
+    });
+
 
 });

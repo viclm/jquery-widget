@@ -15,23 +15,6 @@ module.exports = {
                 test: /\.js$/,
                 loader: "eslint-loader"
             }
-        ],
-        loaders: [
-            {
-                test: /\.css$/,
-                loader: 'style!css?sourceMap'
-            },
-            {
-                test: /\.jsx$/,
-                loader: 'babel',
-                query: {
-                    'plugins': [
-                        ['transform-react-jsx', {
-                            'pragma': 'this.createElement'
-                        }]
-                    ]
-                }
-            }
         ]
     },
     eslint: {

@@ -3,6 +3,5 @@ module.exports = {
     PROPS: 'props',
     REMOVE: 'remove',
     REORDER: 'reorder',
-    REPLACE: 'replace',
-    TEXT: 'text'
+    REPLACE: 'replace'
 };
