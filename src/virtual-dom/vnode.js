@@ -3,6 +3,11 @@ var inherit = require('../util/inherit');
 var VText = require('./vtext');
 var $ = require('jquery');
 
+var attrfix = {
+    classname: 'class',
+    htmlfor: 'for'
+};
+
 function VNode(tagName, props, children) {
     VDOM.call(this, props, children);
     this.tagName = tagName;
@@ -16,6 +21,18 @@ function VNode(tagName, props, children) {
 }
 
 inherit(VNode, VDOM);
+
+VNode.prototype.parse = function (props) {
+    var result = VDOM.prototype.parse.call(this, props);
+    var attributes = {}, attributeName;
+    for (attributeName in result.attributes) {
+        if (result.attributes.hasOwnProperty(attributeName)) {
+            attributes[attrfix[attributeName] || attributeName] = result.attributes[attributeName];
+        }
+    }
+    result.attributes = attributes;
+    return result;
+};
 
 VNode.prototype.render = function (widget) {
     var result = this.parse();

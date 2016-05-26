@@ -3,11 +3,6 @@ var md5 = require('blueimp-md5');
 
 var reventProperty = /^on/;
 
-var attrfix = {
-    classname: 'class',
-    htmlfor: 'for'
-};
-
 var toString = function (obj) {
     if (!obj) {
         return '';
@@ -45,7 +40,7 @@ VDOM.prototype = {
                     events[propertyName.slice(2)] = props[propertyName];
                 }
                 else {
-                    attributes[attrfix[propertyName] || propertyName] = props[propertyName];
+                    attributes[propertyName] = props[propertyName];
                 }
             }
         }

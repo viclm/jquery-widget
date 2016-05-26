@@ -21,8 +21,8 @@ describe('vdom', function () {
         });
         var result = instance.parse();
         expect(result.attributes).toEqual({
-            'class': 'foo',
-            'for': 'bar',
+            classname: 'foo',
+            htmlfor: 'bar',
             id: 'barz',
             qux: 'quux'
         });
