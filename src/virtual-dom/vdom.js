@@ -1,24 +1,22 @@
 var $ = require('jquery');
-var md5 = require('blueimp-md5');
 
 var reventProperty = /^on/;
 
 var toString = function (obj) {
     if (!obj) {
-        return '';
+        return 'undefined';
     }
     var str = [], key, value;
     for (key in obj) {
         if (obj.hasOwnProperty(key)) {
             value = obj[key];
             str.push(key);
+            str.push(':');
             str.push(typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? value : value.toString());
         }
     }
-    return str.join('');
+    return str.join(',');
 };
-
-var delimiter = '|';
 
 function VDOM(props, children) {
     this.props = props || {};
@@ -27,9 +25,19 @@ function VDOM(props, children) {
 
 VDOM.prototype = {
     makeKey: function (factor) {
-        return md5(factor + delimiter + toString(this.props) + delimiter + $.map(this.children, function (child) {
+        var id = this.props.id || this.props['data-id'];
+        if (id) { return id; }
+        var propsStr = toString(this.props);
+        var childrenStr = $.map(this.children, function (child) {
             return child.key;
-        }).join(delimiter));
+        }).join('_');
+        if (propsStr) {
+            factor += '_' + propsStr;
+        }
+        if (childrenStr) {
+            factor += '_' + childrenStr;
+        }
+        return factor;
     },
     parse: function (props) {
         var attributes = {}, events = {}, propertyName;

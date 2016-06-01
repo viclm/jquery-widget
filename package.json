@@ -23,7 +23,6 @@
   },
   "main": "dist/jquery-widget.js",
   "dependencies": {
-    "blueimp-md5": "^2.3.0",
     "jquery": "^1.12.3"
   },
   "devDependencies": {
