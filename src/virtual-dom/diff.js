@@ -79,6 +79,11 @@ diff.prototype = {
                     diffProps[key] = newValue;
                 }
             }
+            else if ($.isFunction(value) && $.isFunction(newValue)) {
+                if (value !== newValue && value.toString() !== newValue.toString()) {
+                    diffProps[key] = newValue;
+                }
+            }
             else if (value !== newValue) {
                 diffProps[key] = newValue;
             }
