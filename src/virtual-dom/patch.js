@@ -8,6 +8,13 @@ function patch(node, patches) {
     this.root = node;
     this.widget = this.root.data('widget-' + this.root.data('widget'));
     this.patches = patches;
+    this.patchesRemaining = 0;
+    for (var key in patches) {
+        if (patches.hasOwnProperty(key)) {
+            this.patchesRemaining++;
+        }
+    }
+
     this.index = -1;
     this.walk(node[0]);
 }
@@ -18,13 +25,17 @@ patch.prototype = {
         var patch = this.patches[index];
         if (patch) {
             this.applyPatch(node, patch);
+            this.patchesRemaining--;
         }
-        if (node === this.root[0] || node && node.nodeType === 1 && !$.data(node, 'widget')) {
+        if (this.patchesRemaining > 0 && (node === this.root[0] || node && node.nodeType === 1 && !$.data(node, 'widget'))) {
             var childNodes = node.childNodes;
             for (var i = 0, len = childNodes.length ; i < len ; i++) {
-                this.walk(childNodes[i]);
+                if (this.walk(childNodes[i])) {
+                    break;
+                }
             }
         }
+        return this.patchesRemaining === 0;
     },
 
     applyPatch: function (node, patches) {

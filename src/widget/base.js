@@ -191,10 +191,8 @@ Widget.prototype = {
 
         var vtree = this.render();
         var patches = vd.diff(this.vtree, vtree).patches;
-        if (!$.isEmptyObject(patches)) {
-            vd.patch(this.element, patches);
-            this.vtree = vtree;
-        }
+        vd.patch(this.element, patches);
+        this.vtree = vtree;
 
         return this;
     },
