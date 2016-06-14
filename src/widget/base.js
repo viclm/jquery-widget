@@ -130,6 +130,8 @@ Widget.prototype = {
         $.each(this.subWidgets, function (index, instance) {
             instance.destroy();
         });
+
+        this.element.remove();
     },
 
     _destroy: $.noop,
