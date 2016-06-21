@@ -28,6 +28,42 @@ describe('patch', function () {
         expect(element.attr('id')).toBeUndefined();
     });
 
+    it('patch events', function () {
+        var spy1 = jasmine.createSpy('1');
+        var spy2 = jasmine.createSpy('2');
+        var spy3 = jasmine.createSpy('3');
+        var handlers = {
+            h1: function () { spy1(); },
+            h2: function () { spy2(); },
+            h3: function () { spy3(); }
+        };
+        var oldTree = new VNode('div', {onclick: handlers.h1, onkeyup: handlers.h2});
+        var newTree = new VNode('div', {onclick: handlers.h3});
+        var diffs = diff(oldTree, newTree).patches;
+        var widget = new (createWidget({
+            render: function () {
+                return oldTree;
+            }
+        }));
+        var element = widget.element;
+
+        element.trigger('click');
+        element.trigger('keyup');
+
+        expect(spy1).toHaveBeenCalledTimes(1);
+        expect(spy2).toHaveBeenCalledTimes(1);
+        expect(spy3).not.toHaveBeenCalled();
+
+        patch(element, diffs);
+
+        element.trigger('click');
+        element.trigger('keyup');
+
+        expect(spy1).toHaveBeenCalledTimes(1);
+        expect(spy2).toHaveBeenCalledTimes(1);
+        expect(spy3).toHaveBeenCalledTimes(1);
+    });
+
     it('patch replace', function () {
         var oldTree = new VNode('div', null, ['foo']);
         var newTree = new VNode('div', null, ['bar']);

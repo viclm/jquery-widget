@@ -45,7 +45,7 @@ VNode.prototype.render = function (widget) {
 };
 
 VNode.prototype.update = function (props, element, widget) {
-    var result = this.parse(props);
+    var result = this.parse(props), eventsRemove = {}, eventsUpdate = {};
     $.each(result.attributes, function (key, value) {
         if (value === null) {
             element.removeProp(key);
@@ -56,7 +56,14 @@ VNode.prototype.update = function (props, element, widget) {
             element.attr(key, value);
         }
     });
-    this.addEvent(result.events, element, widget);
+    $.each(result.events, function (key, value) {
+        eventsRemove[key] = null;
+        if (value !== null) {
+            eventsUpdate[key] = value;
+        }
+    });
+    this.addEvent(eventsRemove, element, widget);
+    this.addEvent(eventsUpdate, element, widget);
 };
 
 
