@@ -12,8 +12,8 @@ describe('vnode', function () {
 
     it('render - with props', function () {
         var widget = createWidget('testWidget', {})();
-        var instance = new VNode('div', {id: 'foo', htmlfor: 'bar', classname: 'baz', qux: 'quux', obj: {}});
-        var element = instance.render(widget);
+        var instance = new VNode('div', {id: 'foo', htmlfor: 'bar', classname: 'baz', qux: 'quux', obj: {}}, null, widget);
+        var element = instance.render();
         expect(element).toEqual(jasmine.any($));
         expect(element[0].tagName).toBe('DIV');
         expect(element[0].attributes.length).toBe(5);
@@ -33,8 +33,8 @@ describe('vnode', function () {
             onClick: spyClick1
         })();
 
-        var instance = new VNode('div', {id: 'foo', onclick: spyClick2, onClick: 'onClick'});
-        var element = instance.render(widget);
+        var instance = new VNode('div', {id: 'foo', onclick: spyClick2, onClick: 'onClick'}, null, widget);
+        var element = instance.render();
 
         expect(element.attr('id')).toBe('foo');
         expect(spyClick1).not.toHaveBeenCalled();
@@ -49,8 +49,8 @@ describe('vnode', function () {
 
     it('render - with children', function () {
         var widget = createWidget('testWidget', {})();
-        var instance = new VNode('div', null, ['foo', new VNode('span')]);
-        var element = instance.render(widget);
+        var instance = new VNode('div', null, ['foo', new VNode('span', null, null, widget)], widget);
+        var element = instance.render();
         expect(element.children().length).toBe(1);
         expect(element[0].childNodes.length).toBe(2);
         expect(element[0].firstChild.nodeValue).toBe('foo');
@@ -60,13 +60,13 @@ describe('vnode', function () {
     it('update', function () {
         var spyClick = jasmine.createSpy('click');
         var spySave = jasmine.createSpy('save');
-        var oldTree = new VNode('div', {id: 'foo', onclick: spyClick});
-        var newTree = new VNode('div', {classname: 'bar', onsave: spySave});
-        var diffProps = {id: null, classname: 'bar', onsave: spySave, onclick: null};
         var widget = createWidget('testWidget', {})();
+        var oldTree = new VNode('div', {id: 'foo', onclick: spyClick}, null, widget);
+        var newTree = new VNode('div', {classname: 'bar', onsave: spySave}, null, widget);
+        var diffProps = {id: null, classname: 'bar', onsave: spySave, onclick: null};
 
-        var element = oldTree.render(widget);
-        newTree.update(diffProps, element, widget);
+        var element = oldTree.render();
+        newTree.update(diffProps, element);
 
         element.trigger('click');
         element.trigger('save');

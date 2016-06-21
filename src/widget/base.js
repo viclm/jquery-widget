@@ -42,11 +42,17 @@ Widget.prototype = {
     },
 
     createWidget: function (widget, props, children) {
+        var vdom;
         children = Array.prototype.slice.call(arguments, 2);
         children = $.grep(children, function (child) {
             return typeof child !== 'undefined';
         });
-        var vdom = new vd[(typeof widget === 'string' ? 'VNode' : 'VWidget')](widget, props, children);
+        if (typeof widget === 'string') {
+            vdom = new vd.VNode(widget, props, children, this);
+        }
+        else {
+            vdom = new vd.VWidget(widget, props, this);
+        }
         return vdom;
     },
 
@@ -65,7 +71,7 @@ Widget.prototype = {
         this.subWidgets = [];
 
         this.vtree = this.render();
-        this.element = this.vtree ? this.vtree.render(this) : $(this.defaultElement);
+        this.element = this.vtree ? this.vtree.render() : $(this.defaultElement);
 
         var element = this.element[0];
 

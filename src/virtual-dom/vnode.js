@@ -8,8 +8,8 @@ var attrfix = {
     htmlfor: 'for'
 };
 
-function VNode(tagName, props, children) {
-    VDOM.call(this, props, children);
+function VNode(tagName, props, children, context) {
+    VDOM.call(this, props, children, context);
     this.tagName = tagName;
     this.children = $.map(this.children, function (child) {
         if (typeof child === 'string' || typeof child === 'number') {
@@ -24,30 +24,28 @@ inherit(VNode, VDOM);
 
 VNode.prototype.parse = function (props) {
     var result = VDOM.prototype.parse.call(this, props);
-    var attributes = {}, attributeName;
-    for (attributeName in result.attributes) {
-        if (result.attributes.hasOwnProperty(attributeName)) {
-            attributes[attrfix[attributeName] || attributeName] = result.attributes[attributeName];
-        }
-    }
+    var attributes = {};
+    $.each(result.attributes, function (key, value) {
+        attributes[attrfix[key] || key] = value;
+    });
     result.attributes = attributes;
     return result;
 };
 
-VNode.prototype.render = function (widget) {
+VNode.prototype.render = function () {
     var result = this.parse();
     var element = $('<' + this.tagName + '>', result.attributes);
-    this.addEvent(result.events, element, widget);
+    this.addEvent(result.events, element);
     element.append($.map(this.children, function (child) {
-        return child.render(widget);
+        return child.render();
     }));
     return element;
 };
 
-VNode.prototype.update = function (props, element, widget) {
+VNode.prototype.update = function (props, element) {
     var result = this.parse(props), eventsRemove = {}, eventsUpdate = {};
     $.each(result.attributes, function (key, value) {
-        if (value === null) {
+        if (value == null) {
             element.removeProp(key);
             element.removeAttr(key);
         }
@@ -58,12 +56,12 @@ VNode.prototype.update = function (props, element, widget) {
     });
     $.each(result.events, function (key, value) {
         eventsRemove[key] = null;
-        if (value !== null) {
+        if (value != null) {
             eventsUpdate[key] = value;
         }
     });
-    this.addEvent(eventsRemove, element, widget);
-    this.addEvent(eventsUpdate, element, widget);
+    this.addEvent(eventsRemove, element);
+    this.addEvent(eventsUpdate, element);
 };
 
 

@@ -1,8 +1,8 @@
 var VDOM = require('./vdom');
 var inherit = require('../util/inherit');
 
-function VWidget(widget, props) {
-    VDOM.call(this, props);
+function VWidget(widget, props, context) {
+    VDOM.call(this, props, null, context);
     this.widget = widget;
     this.key = this.makeKey(widget.prototype.getWidgetName());
 }
@@ -21,18 +21,18 @@ VWidget.prototype.parse = function (widgetName, props) {
     return result;
 };
 
-VWidget.prototype.render = function (parentWidget) {
+VWidget.prototype.render = function () {
     var widget = new this.widget(this.props);
     var element = widget.element;
     var result = this.parse(widget.widgetName);
-    parentWidget.subWidgets.push(widget);
-    this.addEvent(result.events, element, parentWidget);
+    this.context.subWidgets.push(widget);
+    this.addEvent(result.events, element);
     return element;
 };
 
-VWidget.prototype.update = function (props, element, parentWidget) {
+VWidget.prototype.update = function (props, element) {
     var result = this.parse(element.data('widget'), props);
-    this.addEvent(result.events, element, parentWidget);
+    this.addEvent(result.events, element);
     element.data('widget-' + element.data('widget')).option(props);
 };
 

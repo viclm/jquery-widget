@@ -18,9 +18,10 @@ var toString = function (obj) {
     return str.join(',');
 };
 
-function VDOM(props, children) {
+function VDOM(props, children, context) {
     this.props = props || {};
     this.children = children || [];
+    this.context = context;
 }
 
 VDOM.prototype = {
@@ -54,8 +55,8 @@ VDOM.prototype = {
         };
     },
 
-    addEvent: function (events, element, widget) {
-        var name, handler, widgetEvents = {};
+    addEvent: function (events, element) {
+        var name, handler, widgetEvents = {}, widget = this.context;
         for (name in events) {
             if (events.hasOwnProperty(name)) {
                 handler = events[name];
@@ -63,7 +64,7 @@ VDOM.prototype = {
                     widget._off(element, name);
                 }
                 else {
-                    widgetEvents[name] = $.isFunction(handler) ? $.proxy(handler, widget): handler;
+                    widgetEvents[name] = typeof handler === 'string' ? handler: $.proxy(handler, widget);
                 }
             }
         }

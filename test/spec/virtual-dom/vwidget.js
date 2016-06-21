@@ -5,8 +5,8 @@ describe('vwidget', function () {
 
     it('render', function () {
         var parentWidget = createWidget('parentWidget', {})();
-        var instance = new VWidget(createWidget('testWidget', {}), {foo: 'foo'});
-        var element = instance.render(parentWidget);
+        var instance = new VWidget(createWidget('testWidget', {}), {foo: 'foo'}, parentWidget);
+        var element = instance.render();
 
         expect(parentWidget.option('foo')).toBeNull();
         expect(element.data('widget')).toBe('testWidget');
@@ -17,8 +17,8 @@ describe('vwidget', function () {
     it('render - with events', function () {
         var spyClick = jasmine.createSpy('click');
         var parentWidget = createWidget('parentWidget', {})();
-        var instance = new VWidget(createWidget('testWidget', {}), {foo: 'foo', onclick: spyClick});
-        var element = instance.render(parentWidget);
+        var instance = new VWidget(createWidget('testWidget', {}), {foo: 'foo', onclick: spyClick}, parentWidget);
+        var element = instance.render();
 
         element.data('widget-testWidget')._trigger('click');
         expect(parentWidget.option('onclick')).toBeNull();

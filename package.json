@@ -1,7 +1,7 @@
 {
   "name": "jquery-widget",
   "description": "jQuery widget factory with JSX",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": [
     {
       "name": "jQuery Foundation and other contributors",

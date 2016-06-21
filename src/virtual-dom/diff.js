@@ -4,8 +4,6 @@ var VNode = require('./vnode');
 var VWidget = require('./vwidget');
 var $ = require('jquery');
 
-var undef = $.noop();
-
 function diff(oldTree, newTree) {
     if (!(this instanceof diff)) {
         return new diff(oldTree, newTree);
@@ -70,7 +68,7 @@ diff.prototype = {
         var diffProps = {}, that = this;
         $.each(oldProps, function (key, value) {
             var newValue = newProps[key];
-            if (newValue === undef) {
+            if (!(key in newProps)) {
                 diffProps[key] = null;
             }
             else if ($.isPlainObject(value) && $.isPlainObject(newValue)) {
@@ -89,7 +87,7 @@ diff.prototype = {
             }
         });
         $.each(newProps, function (key, value) {
-            if (!oldProps[key]) {
+            if (!(key in oldProps)) {
                 diffProps[key] = value;
             }
         });

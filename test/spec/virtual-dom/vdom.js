@@ -36,6 +36,11 @@ describe('vdom', function () {
         this.spyClick = jasmine.createSpy('click');
         this.spySave = jasmine.createSpy('save');
 
+        this.element = $('<div>');
+        this.widget = createWidget('testWidget', {
+            'onClick': this.spyClick
+        })();
+
         this.instance = new VDOM({
             classname: 'foo',
             htmlfor: 'bar',
@@ -43,15 +48,10 @@ describe('vdom', function () {
             qux: 'quux',
             onclick: 'onClick',
             onsave: this.spySave
-        });
-
-        this.element = $('<div>');
-        this.widget = createWidget('testWidget', {
-            'onClick': this.spyClick
-        })();
+        }, null, this.widget);
 
         var result = this.instance.parse();
-        this.instance.addEvent(result.events, this.element, this.widget);
+        this.instance.addEvent(result.events, this.element);
         this.element.trigger('click');
         this.element.trigger('save');
         expect(this.spyClick).toHaveBeenCalled();
