@@ -3,16 +3,16 @@ var $ = require('jquery');
 var reventProperty = /^on/;
 
 var toString = function (obj) {
-    if (!obj) {
-        return 'undefined';
-    }
-    var str = [], key, value;
+    var str = [], key, value, substr;
     for (key in obj) {
         if (obj.hasOwnProperty(key)) {
             value = obj[key];
-            str.push(key);
-            str.push(':');
-            str.push(typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? value : value.toString());
+            value = typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? '' : value.toString();
+            substr = key;
+            if (value) {
+                substr += ':' + value;
+            }
+            str.push(substr);
         }
     }
     return str.join(',');
@@ -25,19 +25,15 @@ function VDOM(props, children) {
 
 VDOM.prototype = {
     makeKey: function (factor) {
-        var id = this.props.id || this.props['data-id'];
-        if (id) { return id; }
-        var propsStr = toString(this.props);
-        var childrenStr = $.map(this.children, function (child) {
-            return child.key;
-        }).join('_');
-        if (propsStr) {
-            factor += '_' + propsStr;
+        if ('id' in this.props) {
+            return this.props['id'];
         }
-        if (childrenStr) {
-            factor += '_' + childrenStr;
+        else if ('data-id' in this.props) {
+            return this.props['data-id'];
         }
-        return factor;
+        else {
+            return factor += '_' + toString(this.props);
+        }
     },
     parse: function (props) {
         var attributes = {}, events = {}, propertyName;
