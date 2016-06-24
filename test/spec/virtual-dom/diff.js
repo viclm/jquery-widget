@@ -92,9 +92,8 @@ describe('diff', function () {
         newTree = new VNode('div', null, ['bar']);
         diffs = diff(oldTree, newTree).patches;
 
-        expect(diffs[0][0].type).toBe(patchType.REORDER);
-        expect(diffs[0][0].move).toEqual([{type: patchType.REMOVE, index: 0}, {type: patchType.INSERT, node: jasmine.any(VText), index: 0}]);
-        expect(diffs[0][0].move[1].node.text).toBe('bar');
+        expect(diffs[1][0].type).toBe(patchType.REPLACE);
+        expect(diffs[1][0].node.text).toBe('bar');
 
         oldTree = new VNode('div', null, ['foo']);
         newTree = new VNode('div', null, ['foo', 'bar']);

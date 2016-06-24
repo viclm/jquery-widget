@@ -98,14 +98,8 @@ patch.prototype = {
 
     patchReplace: function (node, vdom) {
         var newNode = vdom.render(this.widget)[0];
-        if (node.nodeType === 3) {
-            node.parentNode.innerHTML = '';
-            node.parentNode.appendChild(newNode);
-        }
-        else {
-            node.parentNode.insertBefore(newNode, node);
-            node.parentNode.removeChild(node);
-        }
+        node.parentNode.insertBefore(newNode, node);
+        node.parentNode.removeChild(node);
     }
 };
 

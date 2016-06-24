@@ -44,9 +44,6 @@ Widget.prototype = {
     createWidget: function (widget, props, children) {
         var vdom;
         children = Array.prototype.slice.call(arguments, 2);
-        children = $.grep(children, function (child) {
-            return typeof child !== 'undefined';
-        });
         if (typeof widget === 'string') {
             vdom = new vd.VNode(widget, props, children, this);
         }

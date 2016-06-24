@@ -4,7 +4,7 @@ var inherit = require('../util/inherit');
 function VWidget(widget, props, context) {
     VDOM.call(this, props, null, context);
     this.widget = widget;
-    this.key = this.makeKey(widget.prototype.getWidgetName());
+    //this.key = this.makeKey(widget.prototype.getWidgetName()); TODO getWidgetName should drop?
 }
 
 inherit(VWidget, VDOM);

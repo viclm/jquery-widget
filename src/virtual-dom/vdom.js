@@ -2,22 +2,6 @@ var $ = require('jquery');
 
 var reventProperty = /^on/;
 
-var toString = function (obj) {
-    var str = [], key, value, substr;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            value = obj[key];
-            value = typeof value === 'object' ? toString(value) : typeof value === 'undefined' ? '' : value.toString();
-            substr = key;
-            if (value) {
-                substr += ':' + value;
-            }
-            str.push(substr);
-        }
-    }
-    return str.join(',');
-};
-
 function VDOM(props, children, context) {
     this.props = props || {};
     this.children = children || [];
@@ -25,15 +9,15 @@ function VDOM(props, children, context) {
 }
 
 VDOM.prototype = {
-    makeKey: function (factor) {
+    makeKey: function (index) {
         if ('id' in this.props) {
-            return this.props['id'];
+            this.key = this.props['id'];
         }
         else if ('data-id' in this.props) {
-            return this.props['data-id'];
+            this.key = this.props['data-id'];
         }
         else {
-            return factor += '_' + toString(this.props);
+            this.key = index;
         }
     },
     parse: function (props) {

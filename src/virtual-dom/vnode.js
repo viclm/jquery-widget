@@ -11,13 +11,27 @@ var attrfix = {
 function VNode(tagName, props, children, context) {
     VDOM.call(this, props, children, context);
     this.tagName = tagName;
-    this.children = $.map(this.children, function (child) {
-        if (typeof child === 'string' || typeof child === 'number') {
-            return new VText(child);
+    children = [];
+    for (var i = 0, child ; i < this.children.length ; i++) {
+        child = this.children[i];
+        if ($.isArray(child)) {
+            child.unshift(1);
+            child.unshift(i);
+            Array.prototype.splice.apply(this.children, child);
+            i--;
         }
-        return child;
-    });
-    this.key = this.makeKey(tagName);
+        else {
+            if (child == null) {
+                continue;
+            }
+            else if (typeof child === 'string' || typeof child === 'number') {
+                child = new VText(child);
+            }
+            child.makeKey(i);
+            children.push(child);
+        }
+    }
+    this.children = children;
 }
 
 inherit(VNode, VDOM);
