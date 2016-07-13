@@ -91,4 +91,21 @@ describe('patch', function () {
         expect(element.children().eq(0)[0]).toBe(bar);
     });
 
+    it('patch text node', function () {
+        var widget = new Widget;
+        var oldTree = new VNode('div', null, [new VNode('span', null, ['foo'], widget), 'qux'], widget);
+        var element = oldTree.render();
+
+        expect(element.find('span').html()).toBe('foo');
+        expect(element[0].lastChild.nodeValue).toBe('qux');
+
+        var newTree = new VNode('div', null, [new VNode('span', null, ['foo', 'bar'], widget), 'quxx'], widget);
+        var diffs = diff(oldTree, newTree).patches;
+        patch(element, diffs);
+
+        expect(element.find('span').html()).toBe('foobar');
+        expect(element[0].lastChild.nodeValue).toBe('quxx');
+
+    });
+
 });

@@ -41,8 +41,8 @@ diff.prototype = {
                     if (diffChildren.move.length) {
                         patch.push({type: patchType.REORDER, move: diffChildren.move});
                     }
-                    for (var i = 0, len = oldTree.children.length ; i < len ; i++) {
-                        this.walk(oldTree.children[i], diffChildren.children[i])
+                    for (var i = 0, len = newTree.children.length ; i < len ; i++) {
+                        this.walk(diffChildren.children[i], newTree.children[i]);
                     }
                 }
             }
@@ -102,22 +102,29 @@ diff.prototype = {
             }
             return hash;
         };
+        var oldIndex = getIndex(oldChildren);
         var newIndex = getIndex(newChildren);
         var move = [], children = [], transChildren = [], inserted = {};
         var i, len, node, j;
         for (i = 0, len = oldChildren.length ; i < len ; i++) {
             node = oldChildren[i];
             if (newIndex[node.key] > -1) {
-                transChildren.push(children[i] = newChildren[newIndex[node.key]]);
+                transChildren.push(newChildren[newIndex[node.key]]);
             }
             else {
-                children[i] = null;
                 move.push({type: patchType.REMOVE, index: i});
             }
         }
         j = 0;
         for (i = 0, len = newChildren.length ; i < len ; i++) {
             node = newChildren[i];
+            if (oldIndex[node.key] > -1) {
+                children[i] = oldChildren[oldIndex[node.key]];
+            }
+            else {
+                children[i] = node;
+            }
+
             if (transChildren[j]) {
                 if (node.key === transChildren[j].key) {
                     j++;
