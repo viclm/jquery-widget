@@ -74,21 +74,18 @@ describe('patch', function () {
         var widget = new Widget;
         var oldTree = new VNode('div', null, [new VNode('span', {id: 'foo'}, null, widget), new VNode('span', {id: 'bar'}, null, widget)], widget);
         var element = oldTree.render();
-        var bar = element.children().eq(1)[0];
 
         expect(element.children().length).toBe(2);
         expect(element.children().eq(0).attr('id')).toBe('foo');
         expect(element.children().eq(1).attr('id')).toBe('bar');
 
-        var newTree = new VNode('div', null, [new VNode('span', {id: 'bar'}, null, widget), new VNode('span', {id: 'qux'}, null, widget)], widget);
+        var newTree = new VNode('div', null, [new VNode('span', {id: 'bar'}, null, widget), new VNode('span', {id: 'foo'}, null, widget)], widget);
         var diffs = diff(oldTree, newTree).patches;
         patch(element, diffs);
 
         expect(element.children().length).toBe(2);
         expect(element.children().eq(0).attr('id')).toBe('bar');
-        expect(element.children().eq(1).attr('id')).toBe('qux');
-
-        expect(element.children().eq(0)[0]).toBe(bar);
+        expect(element.children().eq(1).attr('id')).toBe('foo');
     });
 
     it('patch text node', function () {

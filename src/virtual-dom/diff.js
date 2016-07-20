@@ -129,9 +129,9 @@ diff.prototype = {
                 if (node.key === transChildren[j].key) {
                     j++;
                     while (transChildren[j] && inserted[transChildren[j].key]) {
-                        j++
+                        move.push({type: patchType.REMOVE, index: j});
+                        j++;
                     }
-                    continue;
                 }
                 else {
                     move.push({type: patchType.INSERT, node: node, index: j});

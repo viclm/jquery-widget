@@ -109,6 +109,14 @@ describe('diff', function () {
 
         expect(diffs[1]).toEqual([{type: patchType.REORDER, move: [{type: patchType.INSERT, node: jasmine.any(VNode), index: 1}]}]);
         expect(diffs[5]).toEqual([{type: patchType.REPLACE, node: jasmine.any(VText)}]);
+
+        oldTree = new VNode('div', null, [new VNode('span', {'data-id': 'foo'}), new VNode('span', {'data-id': 'bar'})]);
+        newTree = new VNode('div', null, [new VNode('span', {'data-id': 'bar'}), new VNode('span', {'data-id': 'foo'})]);
+        diffs = diff(oldTree, newTree).patches;
+
+        expect(diffs[0][0].move.length).toBe(2);
+        expect(diffs[0][0].move[0].type).toBe(patchType.INSERT);
+        expect(diffs[0][0].move[1].type).toBe(patchType.REMOVE);
     });
 
     it('vwidget vs vwidget, same', function () {

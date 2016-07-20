@@ -69,10 +69,11 @@ patch.prototype = {
                 remove.push({method: 'removeChild', args: [childNodes[item.index]]});
                 childNodes.splice(item.index, 1, null);
             }
-            else if (item.type === patchType.INSERT) {
-                insert.push(item);
+            else {
+                break;
             }
         }
+        insert = move.slice(i);
         for (i = 0, len = childNodes.length ; i < len ; i++) {
             item = childNodes[i];
             if (item !== null) {
@@ -81,12 +82,17 @@ patch.prototype = {
         }
         childNodes = tmp;
         for (i = 0, len = insert.length ; i < len ; i++) {
-            item = insert[i].node.render(this.widget)[0];
-            if (childNodes[insert[i].index]) {
-                insert[i] = {method: 'insertBefore', args: [item, childNodes[insert[i].index]]};
+            if (insert[i].type === patchType.INSERT) {
+                item = insert[i].node.render(this.widget)[0];
+                if (childNodes[insert[i].index]) {
+                    insert[i] = {method: 'insertBefore', args: [item, childNodes[insert[i].index]]};
+                }
+                else {
+                    insert[i] = {method: 'appendChild', args: [item]};
+                }
             }
-            else {
-                insert[i] = {method: 'appendChild', args: [item]};
+            else if (insert[i].type === patchType.REMOVE) {
+                insert[i] = {method: 'removeChild', args: [childNodes[insert[i].index]]};
             }
         }
         tmp = remove.concat(insert);
