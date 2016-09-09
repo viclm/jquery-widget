@@ -27,6 +27,12 @@ patch.prototype = {
             this.applyPatch(node, patch);
             this.patchesRemaining--;
         }
+
+        if (node.replaceComplete) {
+            delete node.replaceComplete;
+            return;
+        }
+
         if (this.patchesRemaining > 0 && (node === this.root[0] || node && node.nodeType === 1 && !$.data(node, 'widget'))) {
             var childNodes = node.childNodes;
             for (var i = 0, len = childNodes.length ; i < len ; i++) {
@@ -106,6 +112,7 @@ patch.prototype = {
         var newNode = vdom.render(this.widget)[0];
         node.parentNode.insertBefore(newNode, node);
         node.parentNode.removeChild(node);
+        node.replaceComplete = true;
     }
 };
 
